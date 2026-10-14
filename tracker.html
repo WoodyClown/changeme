@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Трекер Влада">
+<meta name="theme-color" content="#0a0e17">
+<meta name="color-scheme" content="dark">
+<title>Трекер Влада</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0a0e17; --card:#131a28; --card2:#1a2338; --border:#2a3550;
+  --text:#e6ecf5; --muted:#93a1bd;
+  --good:#10b981; --bad:#ef4444; --warn:#f59e0b; --gold:#fbbf24; --blue:#3b82f6;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bot:env(safe-area-inset-bottom,0px);
+  color-scheme:dark;
+}
+html,body{height:100%}
+html{color-scheme:dark}
+body{
+  background:radial-gradient(1200px 600px at 50% -100px,#1a2340 0%,var(--bg) 60%) fixed;
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Inter",system-ui,sans-serif;
+  line-height:1.5;font-size:16px;
+  padding:calc(14px + var(--safe-top)) 14px calc(28px + var(--safe-bot));
+  min-height:100vh;
+}
+.wrap{max-width:720px;margin:0 auto}
+
+/* Header */
+.hdr{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.hdr .avatar{
+  width:44px;height:44px;border-radius:12px;
+  background:linear-gradient(135deg,#3b82f6,#6366f1);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:20px;color:#fff;flex-shrink:0;
+}
+.hdr .htxt{flex:1;min-width:0}
+.hdr .htxt .hn{font-weight:800;font-size:16px}
+.hdr .htxt .hd{font-size:12px;color:var(--muted)}
+.hdr .streak{
+  background:linear-gradient(135deg,#f59e0b,#ef4444);
+  padding:6px 12px;border-radius:12px;
+  font-weight:800;font-size:13px;color:#fff;
+  display:flex;align-items:center;gap:4px;
+}
+
+/* Tabs — sticky сверху */
+.tabs{
+  display:flex;gap:6px;background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:4px;margin-bottom:16px;overflow-x:auto;
+  position:sticky;top:calc(6px + var(--safe-top));z-index:20;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  background:rgba(19,26,40,.88);
+}
+.tabs button{
+  flex:1;min-width:80px;background:transparent;border:none;
+  color:var(--muted);font-size:13px;font-weight:600;
+  padding:9px 10px;border-radius:8px;cursor:pointer;
+  transition:.15s;font-family:inherit;white-space:nowrap;
+}
+.tabs button.active{background:var(--card2);color:#fff}
+.tabs button:active{opacity:.7}
+
+/* Cards */
+.card{
+  background:linear-gradient(160deg,var(--card2),var(--card));
+  border:1px solid var(--border);border-radius:16px;
+  padding:16px;margin-bottom:12px;
+}
+.card h3{font-size:14px;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.06em;margin-bottom:12px;font-weight:700}
+
+/* Big stat */
+.big-stat{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bs{
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:12px;padding:12px;
+}
+.bs .lbl{font-size:10px;text-transform:uppercase;color:var(--muted);
+  letter-spacing:.06em;margin-bottom:4px}
+.bs .val{font-size:22px;font-weight:800;line-height:1.1}
+.bs .note{font-size:11px;color:var(--muted);margin-top:2px}
+.val.good{color:var(--good)}.val.bad{color:var(--bad)}
+.val.warn{color:var(--warn)}.val.gold{color:var(--gold)}
+.val.blue{color:var(--blue)}
+
+/* Progress */
+.prog{margin-top:12px}
+.prog .pt{display:flex;justify-content:space-between;font-size:12px;
+  color:var(--muted);margin-bottom:6px}
+.prog .bar{height:10px;background:rgba(255,255,255,.06);
+  border-radius:10px;overflow:hidden;position:relative}
+.prog .bar .fill{
+  height:100%;background:linear-gradient(90deg,#3b82f6,#10b981);
+  border-radius:10px;transition:width .6s ease;
+}
+
+/* Motivation box */
+.motiv{
+  border-radius:14px;padding:16px;margin-bottom:12px;
+  border:1px solid var(--border);
+  display:flex;gap:12px;align-items:flex-start;
+}
+.motiv.praise{background:linear-gradient(135deg,rgba(16,185,129,.12),rgba(16,185,129,.03));
+  border-color:rgba(16,185,129,.35)}
+.motiv.scold{background:linear-gradient(135deg,rgba(239,68,68,.12),rgba(239,68,68,.03));
+  border-color:rgba(239,68,68,.35)}
+.motiv.neutral{background:linear-gradient(135deg,rgba(59,130,246,.1),rgba(59,130,246,.02));
+  border-color:rgba(59,130,246,.3)}
+.motiv .ic{font-size:28px;flex-shrink:0;line-height:1}
+.motiv .mtxt{flex:1;font-size:14px;line-height:1.5}
+.motiv .mtxt b{color:#fff}
+.motiv .mtitle{font-weight:800;font-size:15px;margin-bottom:4px}
+.motiv.praise .mtitle{color:#34d399}
+.motiv.scold .mtitle{color:#f87171}
+.motiv.neutral .mtitle{color:#60a5fa}
+
+/* Form */
+.form-row{margin-bottom:12px}
+.form-row label{display:block;font-size:12px;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;font-weight:600}
+.form-row input,.form-row select,.form-row textarea{
+  width:100%;
+  background:#0f1626;
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:12px 14px;
+  color:#fff;
+  font-size:16px;
+  font-family:inherit;
+  transition:.15s;
+  color-scheme:dark;
+  -webkit-appearance:none;
+  appearance:none;
+}
+.form-row input::placeholder,.form-row textarea::placeholder{color:#5a6785}
+.form-row input:focus,.form-row select:focus,.form-row textarea:focus{
+  outline:none;border-color:var(--blue);background:#121a2d;
+}
+
+/* Специально select — тёмный */
+.form-row select{
+  background-color:#0f1626;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2393a1bd' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+  background-repeat:no-repeat;
+  background-position:right 14px center;
+  padding-right:40px;
+  cursor:pointer;
+}
+.form-row select option{
+  background:#0f1626;
+  color:#fff;
+  padding:10px;
+}
+.form-row select option:checked{
+  background:#1a2338;
+  color:#fff;
+}
+
+/* Date & time inputs тоже тёмные */
+.form-row input[type="date"],
+.form-row input[type="time"]{
+  background-color:#0f1626;
+  color:#fff;
+  color-scheme:dark;
+}
+.form-row input[type="date"]::-webkit-calendar-picker-indicator,
+.form-row input[type="time"]::-webkit-calendar-picker-indicator{
+  filter:invert(0.7);
+  cursor:pointer;
+}
+
+.form-row textarea{resize:vertical;min-height:60px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  background:linear-gradient(135deg,#3b82f6,#6366f1);
+  color:#fff;border:none;font-family:inherit;
+  font-weight:700;font-size:15px;
+  padding:14px 20px;border-radius:12px;cursor:pointer;
+  width:100%;transition:.15s;
+}
+.btn:active{transform:scale(.98);opacity:.9}
+.btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn.danger{background:linear-gradient(135deg,#ef4444,#dc2626)}
+.btn.small{padding:10px 14px;font-size:13px;width:auto}
+
+/* History */
+.hist-row{
+  display:grid;grid-template-columns:80px 1fr 60px;
+  gap:10px;align-items:center;
+  padding:12px 0;border-bottom:1px solid var(--border);
+  font-size:14px;
+}
+.hist-row:last-child{border-bottom:none}
+.hist-row .hd{color:var(--muted);font-size:12px}
+.hist-row .hw{font-weight:700;color:#fff}
+.hist-row .hw .delta{font-size:11px;font-weight:500;margin-left:6px}
+.hist-row .delta.up{color:#f87171}
+.hist-row .delta.down{color:#34d399}
+.hist-row .delta.same{color:var(--muted)}
+.hist-row .hx{text-align:right;color:var(--muted);font-size:12px}
+.hist-row button{
+  background:transparent;border:1px solid var(--border);color:var(--muted);
+  width:36px;height:36px;border-radius:8px;cursor:pointer;font-size:16px;
+}
+
+.empty{
+  text-align:center;padding:40px 20px;color:var(--muted);font-size:14px;
+}
+.empty .ic{font-size:48px;display:block;margin-bottom:12px;opacity:.5}
+
+/* Notice / notification banner */
+.note-banner{
+  background:linear-gradient(135deg,rgba(251,191,36,.15),rgba(251,191,36,.03));
+  border:1px solid rgba(251,191,36,.4);
+  border-radius:12px;padding:12px 14px;margin-bottom:12px;
+  font-size:13px;color:#fde68a;display:flex;gap:10px;align-items:flex-start;
+}
+.note-banner b{color:#fbbf24}
+
+/* Mini chart */
+.chart{width:100%;height:auto;display:block;margin-top:8px}
+
+/* Toast */
+.toast{
+  position:fixed;left:50%;bottom:calc(24px + var(--safe-bot));
+  transform:translateX(-50%) translateY(20px);
+  background:#1a2338;border:1px solid var(--border);
+  color:#fff;padding:12px 18px;border-radius:12px;
+  font-size:14px;font-weight:600;box-shadow:0 10px 40px rgba(0,0,0,.5);
+  opacity:0;pointer-events:none;transition:.25s;z-index:100;
+  max-width:calc(100% - 32px);text-align:center;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.view{display:none;animation:fadein .2s}
+.view.active{display:block}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* Small */
+.small-note{font-size:12px;color:var(--muted);margin-top:6px}
+.row-flex{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.divider{height:1px;background:var(--border);margin:14px 0}
+
+/* Confetti */
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:999;overflow:hidden}
+.confetti span{
+  position:absolute;width:8px;height:14px;opacity:.9;
+  animation:conf 2.5s linear forwards;
+}
+@keyframes conf{
+  0%{transform:translateY(-20px) rotate(0);opacity:1}
+  100%{transform:translateY(100vh) rotate(720deg);opacity:0}
+}
+
+/* Мобильная адаптация */
+@media (max-width:420px){
+  .grid-3{grid-template-columns:1fr 1fr}
+  .bs .val{font-size:19px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hdr">
+  <div class="avatar" id="avatar">В</div>
+  <div class="htxt">
+    <div class="hn" id="hName">Влад</div>
+    <div class="hd" id="hDate">—</div>
+  </div>
+  <div class="streak" id="streak">🔥 0</div>
+</div>
+
+<div class="tabs">
+  <button data-tab="dash" class="active">📊 Дашборд</button>
+  <button data-tab="add">✍️ Внести</button>
+  <button data-tab="hist">📅 История</button>
+  <button data-tab="set">⚙️ Ещё</button>
+</div>
+
+<!-- ================= DASH ================= -->
+<div class="view active" id="v-dash">
+  <div id="dashMotiv"></div>
+  <div id="dashNotif"></div>
+
+  <div class="card">
+    <h3>Текущее состояние</h3>
+    <div class="big-stat">
+      <div class="bs"><div class="lbl">Вес</div><div class="val blue" id="dWeight">—</div><div class="note" id="dWeightNote"></div></div>
+      <div class="bs"><div class="lbl">BMI</div><div class="val" id="dBmi">—</div><div class="note" id="dBmiNote"></div></div>
+      <div class="bs"><div class="lbl">Степень</div><div class="val" id="dClass">—</div><div class="note" id="dClassNote"></div></div>
+      <div class="bs"><div class="lbl">До цели</div><div class="val" id="dTarget">—</div><div class="note" id="dTargetNote"></div></div>
+    </div>
+
+    <div class="prog">
+      <div class="pt"><span id="progFrom">—</span><span id="progTo">—</span></div>
+      <div class="bar"><div class="fill" id="progFill" style="width:0%"></div></div>
+      <div class="small-note" id="progText">Начни вносить вес — появится прогресс.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Дневные нормы (обновляется с весом)</h3>
+    <div class="big-stat">
+      <div class="bs"><div class="lbl">BMR</div><div class="val" id="dBmr">—</div><div class="note">базовый метаболизм</div></div>
+      <div class="bs"><div class="lbl">TDEE</div><div class="val" id="dTdee">—</div><div class="note">с активностью</div></div>
+      <div class="bs"><div class="lbl">Калории</div><div class="val gold" id="dCalTarget">—</div><div class="note">цель дефицита</div></div>
+      <div class="bs"><div class="lbl">Белок</div><div class="val" id="dProtein">—</div><div class="note">г/день</div></div>
+    </div>
+    <div class="small-note">Если вес падает быстрее 1 кг/нед — добавь 150 ккал. Если не падает 2 недели — минус 200 ккал.</div>
+  </div>
+
+  <div class="card">
+    <h3>Динамика веса</h3>
+    <div id="chartWrap"></div>
+  </div>
+</div>
+
+<!-- ================= ADD ================= -->
+<div class="view" id="v-add">
+  <div class="card">
+    <h3>Внести запись — <span id="addDate"></span></h3>
+    <div class="form-row">
+      <label>Вес, кг *</label>
+      <input type="text" inputmode="decimal" pattern="[0-9.,]*" id="inWeight" placeholder="напр. 98.4" autocomplete="off">
+    </div>
+    <div class="grid-2">
+      <div class="form-row">
+        <label>Подтягивания (макс чисто)</label>
+        <input type="text" inputmode="numeric" pattern="[0-9]*" id="inPullups" placeholder="0" autocomplete="off">
+      </div>
+      <div class="form-row">
+        <label>Отжимания (макс)</label>
+        <input type="text" inputmode="numeric" pattern="[0-9]*" id="inPushups" placeholder="0" autocomplete="off">
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="form-row">
+        <label>Бег, км</label>
+        <input type="text" inputmode="decimal" pattern="[0-9.,]*" id="inRunKm" placeholder="0" autocomplete="off">
+      </div>
+      <div class="form-row">
+        <label>Время, мин:сек</label>
+        <input type="text" inputmode="numeric" id="inRunTime" placeholder="6:30" autocomplete="off">
+      </div>
+    </div>
+    <div class="grid-3">
+      <div class="form-row">
+        <label>Шаги</label>
+        <input type="text" inputmode="numeric" pattern="[0-9]*" id="inSteps" placeholder="0" autocomplete="off">
+      </div>
+      <div class="form-row">
+        <label>Калории</label>
+        <input type="text" inputmode="numeric" pattern="[0-9]*" id="inCal" placeholder="0" autocomplete="off">
+      </div>
+      <div class="form-row">
+        <label>Сон, ч</label>
+        <input type="text" inputmode="decimal" pattern="[0-9.,]*" id="inSleep" placeholder="0" autocomplete="off">
+      </div>
+    </div>
+    <div class="form-row">
+      <label>Тренировка выполнена?</label>
+      <select id="inWorkout">
+        <option value="yes">Да, полностью</option>
+        <option value="partial">Частично</option>
+        <option value="no">Нет / отдых</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Заметки (что болело, как самочувствие)</label>
+      <textarea id="inNotes" placeholder="Колени, спина, дыхалка, настроение..."></textarea>
+    </div>
+    <button class="btn" id="btnSave">Сохранить запись</button>
+    <div class="small-note">Все данные хранятся только на этом телефоне. Никуда не отправляются.</div>
+  </div>
+</div>
+
+<!-- ================= HISTORY ================= -->
+<div class="view" id="v-hist">
+  <div class="card">
+    <h3>Все записи</h3>
+    <div id="histList"></div>
+  </div>
+  <div class="card">
+    <h3>Экспорт / импорт</h3>
+    <div class="row-flex">
+      <button class="btn ghost small" id="btnExport">📤 Скачать JSON</button>
+      <button class="btn ghost small" id="btnImport">📥 Загрузить JSON</button>
+      <button class="btn danger small" id="btnClear">🗑 Удалить всё</button>
+    </div>
+    <input type="file" id="fileImport" accept="application/json" style="display:none">
+  </div>
+</div>
+
+<!-- ================= SETTINGS ================= -->
+<div class="view" id="v-set">
+  <div class="card">
+    <h3>Профиль</h3>
+    <div class="form-row"><label>Имя</label><input type="text" id="sName" autocomplete="off"></div>
+    <div class="grid-3">
+      <div class="form-row"><label>Возраст</label><input type="text" inputmode="numeric" pattern="[0-9]*" id="sAge"></div>
+      <div class="form-row"><label>Рост, см</label><input type="text" inputmode="numeric" pattern="[0-9]*" id="sHeight"></div>
+      <div class="form-row"><label>Пол</label>
+        <select id="sGender">
+          <option value="m">М</option><option value="f">Ж</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="form-row"><label>Стартовый вес</label><input type="text" inputmode="decimal" pattern="[0-9.,]*" id="sStartW"></div>
+      <div class="form-row"><label>Целевой вес</label><input type="text" inputmode="decimal" pattern="[0-9.,]*" id="sTargetW"></div>
+    </div>
+    <div class="form-row"><label>Дата старта</label><input type="date" id="sStartDate"></div>
+    <div class="form-row"><label>Уровень активности</label>
+      <select id="sActivity">
+        <option value="1.2">Сидячий (машина, офис)</option>
+        <option value="1.375">Лёгкая (1–3 трен/нед)</option>
+        <option value="1.55">Средняя (3–5 трен/нед)</option>
+        <option value="1.725">Высокая (6–7 трен/нед)</option>
+      </select>
+    </div>
+    <div class="form-row"><label>Дефицит калорий, %</label>
+      <select id="sDeficit">
+        <option value="15">15% (мягкий)</option>
+        <option value="20" selected>20% (стандарт)</option>
+        <option value="25">25% (жёсткий)</option>
+      </select>
+    </div>
+    <button class="btn" id="btnSaveProfile">Сохранить профиль</button>
+  </div>
+
+  <div class="card">
+    <h3>Напоминания</h3>
+    <div class="note-banner">
+      <div>⚠️</div>
+      <div>На iPhone уведомления работают, только если приложение <b>добавлено на экран «Домой»</b> и открыто. Фоновые уведомления на iOS для PWA без сервера невозможны — это ограничение Apple.</div>
+    </div>
+    <div class="form-row">
+      <label>Утреннее напоминание (взвешивание)</label>
+      <input type="time" id="sMorningTime" value="07:30">
+    </div>
+    <div class="form-row">
+      <label>Вечернее напоминание (тренировка/отчёт)</label>
+      <input type="time" id="sEveningTime" value="21:00">
+    </div>
+    <div class="form-row">
+      <label>Ругать за пропуски</label>
+      <select id="sScold">
+        <option value="1">Да, жёстко</option>
+        <option value="0">Нет</option>
+      </select>
+    </div>
+    <button class="btn" id="btnEnableNotif">🔔 Разрешить уведомления</button>
+    <div class="row-flex" style="margin-top:10px">
+      <button class="btn ghost small" id="btnTestNotif">Тест уведомления</button>
+      <button class="btn ghost small" id="btnSaveSettings">Сохранить настройки</button>
+    </div>
+    <div class="small-note" id="notifStatus">Статус: неизвестно</div>
+  </div>
+</div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   STORAGE
+   ============================================================ */
+const KEY = 'vlad_tracker_v2';
+
+function defaultData() {
+  return {
+    profile: {
+      name: 'Влад',
+      age: 21,
+      gender: 'm',
+      height: 178,
+      startWeight: 100,
+      startDate: todayISO(),
+      targetWeight: 76,
+      activity: 1.375,
+      deficit: 20
+    },
+    entries: {},
+    settings: {
+      morningTime: '07:30',
+      eveningTime: '21:00',
+      scold: 1,
+      lastNotified: {},
+      notifEnabled: false
+    }
+  };
+}
+
+function load() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) {
+      // миграция со старого ключа, если есть
+      const old = localStorage.getItem('vlad_tracker_v1');
+      if (old) {
+        localStorage.setItem(KEY, old);
+        return load();
+      }
+      return defaultData();
+    }
+    const d = JSON.parse(raw);
+    d.profile = Object.assign(defaultData().profile, d.profile || {});
+    d.settings = Object.assign(defaultData().settings, d.settings || {});
+    d.entries = d.entries || {};
+    return d;
+  } catch (e) { return defaultData(); }
+}
+function save(d) {
+  localStorage.setItem(KEY, JSON.stringify(d));
+}
+
+let DATA = load();
+
+/* ============================================================
+   UTILS
+   ============================================================ */
+function todayISO() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function dateRu(iso) {
+  if (!iso) return '—';
+  const [y,m,d] = iso.split('-');
+  return `${d}.${m}.${y}`;
+}
+function daysBetween(a, b) {
+  const da = new Date(a + 'T00:00:00');
+  const db = new Date(b + 'T00:00:00');
+  return Math.round((db - da) / 86400000);
+}
+function fmtDate(iso) {
+  const d = new Date(iso + 'T00:00:00');
+  const days = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+  return days[d.getDay()] + ', ' + dateRu(iso);
+}
+function shiftDate(iso, delta) {
+  const d = new Date(iso + 'T00:00:00');
+  d.setDate(d.getDate() + delta);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function parseNum(v) {
+  if (typeof v === 'number') return v;
+  if (!v) return 0;
+  const s = String(v).replace(',', '.').replace(/[^0-9.\-]/g, '');
+  const n = parseFloat(s);
+  return isNaN(n) ? 0 : n;
+}
+function toast(msg, ms = 2200) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._h);
+  t._h = setTimeout(()=>t.classList.remove('show'), ms);
+}
+
+/* ============================================================
+   CALCULATIONS
+   ============================================================ */
+function sortedEntries() {
+  const arr = Object.entries(DATA.entries).map(([date, e]) => ({date, ...e}));
+  arr.sort((a,b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+  return arr;
+}
+function latestWeight() {
+  const arr = sortedEntries().filter(e => typeof e.weight === 'number' && e.weight > 0);
+  return arr.length ? arr[arr.length-1].weight : DATA.profile.startWeight;
+}
+function latestEntry() {
+  const arr = sortedEntries();
+  return arr.length ? arr[arr.length-1] : null;
+}
+function prevWeight(fromDate) {
+  const arr = sortedEntries().filter(e => e.date < fromDate && e.weight > 0);
+  return arr.length ? arr[arr.length-1].weight : null;
+}
+function bmi(weight, heightCm) {
+  const h = heightCm / 100;
+  return weight / (h*h);
+}
+function bmiClass(v) {
+  if (v < 18.5) return { label: 'Недостаток', color: 'warn', note: 'надо набрать' };
+  if (v < 25)   return { label: 'Норма',      color: 'good', note: 'отлично' };
+  if (v < 30)   return { label: 'Избыточный', color: 'warn', note: 'предожирение' };
+  if (v < 35)   return { label: 'Ожирение I', color: 'bad',  note: 'пора худеть' };
+  if (v < 40)   return { label: 'Ожирение II',color: 'bad',  note: 'критично' };
+  return              { label: 'Ожирение III',color: 'bad',  note: 'срочно к врачу' };
+}
+function bmr(weight, height, age, gender) {
+  if (gender === 'f') return 10*weight + 6.25*height - 5*age - 161;
+  return 10*weight + 6.25*height - 5*age + 5;
+}
+function tdee(weight) {
+  const p = DATA.profile;
+  const b = bmr(weight, p.height, p.age, p.gender);
+  return b * parseFloat(p.activity);
+}
+function calorieTarget(weight) {
+  const t = tdee(weight);
+  const target = t * (1 - parseFloat(DATA.profile.deficit)/100);
+  return Math.max(1400, Math.round(target / 10) * 10);
+}
+function proteinTarget(weight) {
+  return Math.round(weight * 1.8);
+}
+
+/* ============================================================
+   STREAK
+   ============================================================ */
+function computeStreak() {
+  const dates = Object.keys(DATA.entries).sort();
+  if (!dates.length) return { current: 0, best: 0 };
+  const today = todayISO();
+  let cur = 0;
+  let d = today;
+  while (DATA.entries[d]) { cur++; d = shiftDate(d, -1); }
+  if (!DATA.entries[today]) {
+    const y = shiftDate(today, -1);
+    if (DATA.entries[y]) {
+      cur = 0;
+      let dd = y;
+      while (DATA.entries[dd]) { cur++; dd = shiftDate(dd, -1); }
+    }
+  }
+  let best = 0, run = 0, prev = null;
+  for (const dt of dates) {
+    if (prev && daysBetween(prev, dt) === 1) run++;
+    else run = 1;
+    if (run > best) best = run;
+    prev = dt;
+  }
+  return { current: cur, best };
+}
+
+/* ============================================================
+   MOTIVATION ENGINE
+   ============================================================ */
+function motivationMessage() {
+  const arr = sortedEntries().filter(e => e.weight > 0);
+  const today = todayISO();
+
+  if (arr.length) {
+    const last = arr[arr.length-1];
+    const gap = daysBetween(last.date, today);
+    if (gap >= 1 && !DATA.entries[today]) {
+      if (gap === 1) {
+        return { type: 'neutral', icon: '⏰',
+          title: 'Сегодня ещё не вносил',
+          text: 'Не пропусти день. Внеси вес и тренировку — <b>streak продолжается</b>. Один пропуск превращается в два. Два — в неделю.' };
+      }
+      if (gap === 2) {
+        return { type: 'scold', icon: '😠',
+          title: 'Пропустил вчера',
+          text: `Последняя запись — ${dateRu(last.date)}. Ты уже <b>${gap} дня без записи</b>. Это тот момент, когда люди сдаются. Не сдавайся.` };
+      }
+      return { type: 'scold', icon: '💀',
+        title: `Ты пропал на ${gap} дней`,
+        text: `Последняя запись — ${dateRu(last.date)}. Это уже саботаж. <b>Хватит.</b> Возьми телефон, встань на весы.` };
+    }
+  } else {
+    return { type: 'neutral', icon: '🚀',
+      title: 'Добро пожаловать',
+      text: 'Первая запись — начало. Внеси текущий вес — и через 28 недель ты не узнаешь себя.' };
+  }
+
+  if (arr.length >= 2) {
+    const last = arr[arr.length-1];
+    const prev = prevWeight(last.date);
+    if (prev && prev !== last.weight) {
+      const diff = +(last.weight - prev).toFixed(1);
+      const pct = ((diff / prev) * 100).toFixed(1);
+      if (diff <= -0.3) {
+        const streak = computeStreak();
+        if (streak.current >= 14) {
+          return { type: 'praise', icon: '🏆',
+            title: `${streak.current} дней подряд — ты машина`,
+            text: `Вес ${prev} → ${last.weight} кг (<b>−${Math.abs(diff)} кг</b>). Стрик ${streak.current}. Скоро начнут замечать окружающие.` };
+        }
+        if (streak.current >= 7) {
+          return { type: 'praise', icon: '🔥',
+            title: `Неделя без пропусков`,
+            text: `−${Math.abs(diff)} кг. Стрик ${streak.current}. <b>Ты на правильном пути.</b>` };
+        }
+        return { type: 'praise', icon: '✅',
+          title: 'Вес идёт вниз',
+          text: `−${Math.abs(diff)} кг (${pct}%). Так держать.` };
+      }
+      if (Math.abs(diff) < 0.3) {
+        return { type: 'neutral', icon: '😐',
+          title: 'Вес стоит',
+          text: `Изменение ${diff > 0 ? '+' : ''}${diff} кг. Плато — нормально. Проверь калории и шаги. Если 2 недели стоит — минус 200 ккал.` };
+      }
+      if (diff >= 0.5) {
+        return { type: 'scold', icon: '📈',
+          title: `+${diff} кг — откат`,
+          text: `Вес ${prev} → ${last.weight} кг. Что жрёшь? <b>Сегодня — дефицит, завтра — турник.</b>` };
+      }
+      if (diff >= 0.3) {
+        return { type: 'scold', icon: '⚠️',
+          title: 'Вес пошёл вверх',
+          text: `+${diff} кг. Убери лишнее сегодня: без булок, прогулка 60 мин.` };
+      }
+    }
+  }
+
+  const streak = computeStreak();
+  if (streak.current >= 3) {
+    return { type: 'praise', icon: '👊',
+      title: `${streak.current} дней подряд`,
+      text: 'Ты держишь ритм. Продолжай.' };
+  }
+  return { type: 'neutral', icon: '💪',
+    title: 'Работаем',
+    text: 'Внеси запись и не сдавайся. День за днём.' };
+}
+
+function renderMotiv() {
+  const m = motivationMessage();
+  document.getElementById('dashMotiv').innerHTML = `
+    <div class="motiv ${m.type}">
+      <div class="ic">${m.icon}</div>
+      <div class="mtxt">
+        <div class="mtitle">${m.title}</div>
+        <div>${m.text}</div>
+      </div>
+    </div>`;
+}
+
+/* ============================================================
+   CONFETTI
+   ============================================================ */
+function confetti() {
+  const c = document.createElement('div');
+  c.className = 'confetti';
+  const colors = ['#3b82f6','#10b981','#f59e0b','#ef4444','#a855f7','#fbbf24'];
+  for (let i = 0; i < 60; i++) {
+    const s = document.createElement('span');
+    s.style.left = Math.random()*100 + '%';
+    s.style.background = colors[Math.floor(Math.random()*colors.length)];
+    s.style.animationDelay = (Math.random()*0.4) + 's';
+    s.style.animationDuration = (1.8 + Math.random()*1.2) + 's';
+    c.appendChild(s);
+  }
+  document.body.appendChild(c);
+  setTimeout(()=>c.remove(), 3200);
+}
+
+/* ============================================================
+   RENDER DASH
+   ============================================================ */
+function renderDash() {
+  const p = DATA.profile;
+  const w = latestWeight();
+  const height = p.height;
+  const bmiV = bmi(w, height);
+  const cls = bmiClass(bmiV);
+  const target = p.targetWeight;
+  const remaining = Math.max(0, +(w - target).toFixed(1));
+  const start = p.startWeight;
+  const total = Math.max(0.1, start - target);
+  const done = Math.max(0, start - w);
+  const pct = Math.min(100, Math.max(0, (done / total) * 100));
+
+  document.getElementById('avatar').textContent = (p.name[0] || 'В').toUpperCase();
+  document.getElementById('hName').textContent = p.name;
+  document.getElementById('hDate').textContent = fmtDate(todayISO());
+
+  const st = computeStreak();
+  document.getElementById('streak').textContent = '🔥 ' + st.current;
+
+  const dW = document.getElementById('dWeight');
+  dW.textContent = w + ' кг';
+  dW.className = 'val ' + (w <= target ? 'good' : 'blue');
+
+  const lastE = latestEntry();
+  const prevW = lastE ? prevWeight(lastE.date) : null;
+  const dNote = document.getElementById('dWeightNote');
+  if (prevW && lastE) {
+    const diff = +(lastE.weight - prevW).toFixed(1);
+    if (diff === 0) dNote.textContent = 'без изменений';
+    else if (diff < 0) dNote.innerHTML = `<span style="color:#34d399">−${Math.abs(diff)} кг</span> с прошлой`;
+    else dNote.innerHTML = `<span style="color:#f87171">+${diff} кг</span> с прошлой`;
+  } else {
+    dNote.textContent = 'старт';
+  }
+
+  const dBmi = document.getElementById('dBmi');
+  dBmi.textContent = bmiV.toFixed(1);
+  dBmi.className = 'val ' + cls.color;
+  document.getElementById('dBmiNote').textContent = 'норма 18.5–24.9';
+
+  const dClass = document.getElementById('dClass');
+  dClass.textContent = cls.label;
+  dClass.className = 'val ' + cls.color;
+  document.getElementById('dClassNote').textContent = cls.note;
+
+  const dTarget = document.getElementById('dTarget');
+  dTarget.textContent = remaining > 0 ? remaining + ' кг' : '✅ цель';
+  dTarget.className = 'val ' + (remaining > 0 ? 'warn' : 'good');
+  document.getElementById('dTargetNote').textContent = 'до ' + target + ' кг';
+
+  document.getElementById('progFrom').textContent = start + ' кг';
+  document.getElementById('progTo').textContent = target + ' кг';
+  document.getElementById('progFill').style.width = pct.toFixed(1) + '%';
+  const days = daysBetween(p.startDate, todayISO());
+  const daysTotal = daysBetween(p.startDate, '2027-05-01');
+  const daysLeft = Math.max(0, daysBetween(todayISO(), '2027-05-01'));
+  document.getElementById('progText').innerHTML =
+    `Сброшено <b>${done.toFixed(1)} кг</b> из ${total.toFixed(1)} (${pct.toFixed(1)}%). День ${days} из ${daysTotal}. Осталось <b>${daysLeft}</b> дней.`;
+
+  const bmrV = bmr(w, height, p.age, p.gender);
+  const tdeeV = tdee(w);
+  const calT = calorieTarget(w);
+  const prot = proteinTarget(w);
+  document.getElementById('dBmr').textContent = Math.round(bmrV) + ' ккал';
+  document.getElementById('dTdee').textContent = Math.round(tdeeV) + ' ккал';
+  document.getElementById('dCalTarget').textContent = calT + ' ккал';
+  document.getElementById('dProtein').textContent = prot + ' г';
+
+  renderChart();
+}
+
+function renderChart() {
+  const arr = sortedEntries().filter(e => e.weight > 0);
+  const wrap = document.getElementById('chartWrap');
+  if (arr.length < 2) {
+    wrap.innerHTML = '<div class="empty"><div class="ic">📉</div>Нужно минимум 2 записи, чтобы построить график.</div>';
+    return;
+  }
+  const W = 700, H = 220, PL = 40, PR = 16, PT = 16, PB = 28;
+  const innerW = W - PL - PR, innerH = H - PT - PB;
+  const weights = arr.map(e => e.weight);
+  const minW = Math.min(...weights) - 1;
+  const maxW = Math.max(...weights) + 1;
+  const range = Math.max(1, maxW - minW);
+
+  const points = arr.map((e, i) => {
+    const x = PL + (i / (arr.length - 1)) * innerW;
+    const y = PT + (1 - (e.weight - minW) / range) * innerH;
+    return { x, y, w: e.weight, date: e.date };
+  });
+
+  const line = points.map((p, i) => (i === 0 ? 'M' : 'L') + p.x + ',' + p.y).join(' ');
+  const area = line + ` L${points[points.length-1].x},${H-PB} L${points[0].x},${H-PB} Z`;
+
+  let grid = '';
+  for (let i = 0; i <= 4; i++) {
+    const y = PT + (i/4) * innerH;
+    const wv = (maxW - (i/4) * range).toFixed(0);
+    grid += `<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="rgba(255,255,255,.06)"/>`;
+    grid += `<text x="${PL-6}" y="${y+4}" fill="#6b7896" font-size="10" text-anchor="end">${wv}</text>`;
+  }
+
+  const last = points[points.length-1];
+
+  const ty = PT + (1 - (DATA.profile.targetWeight - minW) / range) * innerH;
+  const targetLine = (DATA.profile.targetWeight >= minW && DATA.profile.targetWeight <= maxW)
+    ? `<line x1="${PL}" y1="${ty}" x2="${W-PR}" y2="${ty}" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="6 4"/>` +
+      `<text x="${W-PR}" y="${ty-4}" fill="#fbbf24" font-size="10" text-anchor="end">цель ${DATA.profile.targetWeight} кг</text>`
+    : '';
+
+  wrap.innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" class="chart">
+      <defs>
+        <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#3b82f6" stop-opacity=".35"/>
+          <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      ${grid}
+      <path d="${area}" fill="url(#cg)"/>
+      <path d="${line}" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      ${targetLine}
+      <circle cx="${last.x}" cy="${last.y}" r="6" fill="#0a0e17" stroke="#10b981" stroke-width="3"/>
+      <text x="${last.x}" y="${last.y-12}" fill="#fff" font-size="11" font-weight="700" text-anchor="middle">${last.w} кг</text>
+    </svg>`;
+}
+
+/* ============================================================
+   RENDER HISTORY
+   ============================================================ */
+function renderHist() {
+  const arr = sortedEntries().slice().reverse();
+  const wrap = document.getElementById('histList');
+  if (!arr.length) {
+    wrap.innerHTML = '<div class="empty"><div class="ic">📭</div>Пока пусто. Внеси первую запись.</div>';
+    return;
+  }
+  wrap.innerHTML = arr.map(e => {
+    const prev = prevWeight(e.date);
+    let delta = '';
+    if (prev && e.weight) {
+      const d = +(e.weight - prev).toFixed(1);
+      if (d === 0) delta = '<span class="delta same">0</span>';
+      else if (d < 0) delta = `<span class="delta down">−${Math.abs(d)}</span>`;
+      else delta = `<span class="delta up">+${d}</span>`;
+    }
+    const extras = [];
+    if (e.pullups) extras.push(`🏋️ ${e.pullups}`);
+    if (e.runKm) extras.push(`🏃 ${e.runKm} км`);
+    if (e.steps) extras.push(`👣 ${e.steps}`);
+    return `
+      <div class="hist-row">
+        <div>
+          <div class="hd">${dateRu(e.date)}</div>
+          <div class="hw">${e.weight ? e.weight + ' кг' : '—'}${delta}</div>
+        </div>
+        <div class="hx">${extras.join(' · ') || '—'}</div>
+        <div><button data-del="${e.date}">🗑</button></div>
+      </div>`;
+  }).join('');
+  wrap.querySelectorAll('[data-del]').forEach(b => {
+    b.addEventListener('click', () => {
+      const d = b.dataset.del;
+      if (confirm('Удалить запись за ' + dateRu(d) + '?')) {
+        delete DATA.entries[d];
+        save(DATA);
+        renderAll();
+        toast('Удалено');
+      }
+    });
+  });
+}
+
+/* ============================================================
+   RENDER ALL
+   ============================================================ */
+function renderAll() {
+  renderMotiv();
+  renderDash();
+  renderHist();
+  renderNotifBanner();
+}
+
+/* ============================================================
+   SAVE ENTRY
+   ============================================================ */
+document.getElementById('btnSave').addEventListener('click', () => {
+  const date = todayISO();
+  const w = parseNum(document.getElementById('inWeight').value);
+  if (!w || w <= 0 || w > 300) {
+    toast('Введи корректный вес');
+    return;
+  }
+  const entry = {
+    weight: w,
+    pullups: Math.round(parseNum(document.getElementById('inPullups').value)),
+    pushups: Math.round(parseNum(document.getElementById('inPushups').value)),
+    runKm: parseNum(document.getElementById('inRunKm').value),
+    runTime: document.getElementById('inRunTime').value || '',
+    steps: Math.round(parseNum(document.getElementById('inSteps').value)),
+    calories: Math.round(parseNum(document.getElementById('inCal').value)),
+    sleep: parseNum(document.getElementById('inSleep').value),
+    workout: document.getElementById('inWorkout').value,
+    notes: document.getElementById('inNotes').value || ''
+  };
+  const isNew = !DATA.entries[date];
+  const prevW = prevWeight(date);
+  DATA.entries[date] = entry;
+  save(DATA);
+
+  if (prevW && w < prevW - 0.3) {
+    confetti();
+    toast(`✅ −${(prevW - w).toFixed(1)} кг. Молодец!`);
+  } else if (prevW && w > prevW + 0.5) {
+    toast(`⚠️ +${(w - prevW).toFixed(1)} кг. Подтянись.`);
+  } else {
+    toast('💾 Записано');
+  }
+
+  if (isNew) {
+    const st = computeStreak();
+    if (st.current > 0 && st.current % 7 === 0) {
+      setTimeout(() => { confetti(); toast(`🔥 ${st.current} дней подряд!`, 3000); }, 700);
+    }
+  }
+
+  ['inWeight','inPullups','inPushups','inRunKm','inRunTime','inSteps','inCal','inSleep','inNotes']
+    .forEach(id => document.getElementById(id).value = '');
+  document.getElementById('inWorkout').value = 'yes';
+
+  renderAll();
+  switchTab('dash');
+});
+
+/* ============================================================
+   TABS
+   ============================================================ */
+function switchTab(name) {
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('v-' + name).classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+document.querySelectorAll('.tabs button').forEach(b => {
+  b.addEventListener('click', () => switchTab(b.dataset.tab));
+});
+
+/* ============================================================
+   SETTINGS
+   ============================================================ */
+function loadSettings() {
+  const p = DATA.profile, s = DATA.settings;
+  document.getElementById('sName').value = p.name;
+  document.getElementById('sAge').value = p.age;
+  document.getElementById('sHeight').value = p.height;
+  document.getElementById('sGender').value = p.gender;
+  document.getElementById('sStartW').value = p.startWeight;
+  document.getElementById('sTargetW').value = p.targetWeight;
+  document.getElementById('sStartDate').value = p.startDate;
+  document.getElementById('sActivity').value = p.activity;
+  document.getElementById('sDeficit').value = p.deficit;
+  document.getElementById('sMorningTime').value = s.morningTime;
+  document.getElementById('sEveningTime').value = s.eveningTime;
+  document.getElementById('sScold').value = s.scold;
+  updateNotifStatus();
+}
+
+document.getElementById('btnSaveProfile').addEventListener('click', () => {
+  DATA.profile = {
+    name: document.getElementById('sName').value.trim() || 'Влад',
+    age: Math.round(parseNum(document.getElementById('sAge').value)) || 21,
+    height: parseNum(document.getElementById('sHeight').value) || 178,
+    gender: document.getElementById('sGender').value,
+    startWeight: parseNum(document.getElementById('sStartW').value) || 100,
+    targetWeight: parseNum(document.getElementById('sTargetW').value) || 76,
+    startDate: document.getElementById('sStartDate').value || todayISO(),
+    activity: parseFloat(document.getElementById('sActivity').value) || 1.375,
+    deficit: parseFloat(document.getElementById('sDeficit').value) || 20
+  };
+  save(DATA);
+  renderAll();
+  toast('✅ Профиль сохранён');
+});
+
+document.getElementById('btnSaveSettings').addEventListener('click', () => {
+  DATA.settings.morningTime = document.getElementById('sMorningTime').value;
+  DATA.settings.eveningTime = document.getElementById('sEveningTime').value;
+  DATA.settings.scold = parseInt(document.getElementById('sScold').value);
+  save(DATA);
+  toast('✅ Настройки сохранены');
+});
+
+/* ============================================================
+   NOTIFICATIONS
+   ============================================================ */
+function updateNotifStatus() {
+  const el = document.getElementById('notifStatus');
+  if (!('Notification' in window)) {
+    el.textContent = 'Статус: браузер не поддерживает';
+    return;
+  }
+  const p = Notification.permission;
+  const map = { granted: '✅ разрешены', denied: '❌ запрещены', default: '⚪ не запрошены' };
+  el.textContent = 'Статус: ' + (map[p] || p);
+}
+
+document.getElementById('btnEnableNotif').addEventListener('click', async () => {
+  if (!('Notification' in window)) {
+    toast('Браузер не поддерживает уведомления');
+    return;
+  }
+  try {
+    const p = await Notification.requestPermission();
+    updateNotifStatus();
+    if (p === 'granted') {
+      DATA.settings.notifEnabled = true;
+      save(DATA);
+      toast('🔔 Уведомления разрешены');
+      new Notification('Отлично!', { body: 'Буду напоминать про вес и тренировки.', tag: 'welcome' });
+    } else {
+      toast('Уведомления не разрешены');
+    }
+  } catch(e) { toast('Ошибка: ' + e.message); }
+});
+
+document.getElementById('btnTestNotif').addEventListener('click', () => {
+  if (Notification.permission !== 'granted') {
+    toast('Сначала разреши уведомления');
+    return;
+  }
+  new Notification('👊 Тренируйся', { body: 'Влад, ты ещё не внёс вес сегодня. Встань на весы.', tag: 'test' });
+});
+
+function checkReminders() {
+  if (!DATA.settings.notifEnabled) return;
+  if (Notification.permission !== 'granted') return;
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  const cur = hh + ':' + mm;
+  const today = todayISO();
+  const last = DATA.settings.lastNotified || {};
+
+  if (cur === DATA.settings.morningTime && last.morning !== today) {
+    new Notification('⚖️ Взвешивание', {
+      body: 'Влад, доброе утро. Встань на весы и внеси запись.',
+      tag: 'morning'
+    });
+    last.morning = today;
+    DATA.settings.lastNotified = last;
+    save(DATA);
+  }
+
+  if (cur === DATA.settings.eveningTime && last.evening !== today) {
+    const hasToday = !!DATA.entries[today];
+    if (!hasToday) {
+      new Notification('🔥 День не закрыт', {
+        body: 'Ты ещё не внёс запись за сегодня. Долг за день — начало пропасти.',
+        tag: 'evening'
+      });
+    } else {
+      new Notification('✅ День закрыт', {
+        body: 'Запись за сегодня есть. Отдыхай, завтра снова в бой.',
+        tag: 'evening'
+      });
+    }
+    last.evening = today;
+    DATA.settings.lastNotified = last;
+    save(DATA);
+  }
+}
+setInterval(checkReminders, 30000);
+
+/* Баннер про пропуски */
+function renderNotifBanner() {
+  const el = document.getElementById('dashNotif');
+  const arr = sortedEntries();
+  if (!arr.length) { el.innerHTML = ''; return; }
+  const last = arr[arr.length-1];
+  const gap = daysBetween(last.date, todayISO());
+  if (gap >= 2) {
+    el.innerHTML = `
+      <div class="note-banner">
+        <div>🚨</div>
+        <div><b>Пропуск ${gap} дн.</b> Последняя запись — ${dateRu(last.date)}. Внеси сейчас.</div>
+      </div>`;
+  } else if (gap === 1 && !DATA.entries[todayISO()]) {
+    el.innerHTML = `
+      <div class="note-banner">
+        <div>⏰</div>
+        <div>Сегодня ещё нет записи. <b>Streak под угрозой.</b></div>
+      </div>`;
+  } else if (Notification.permission !== 'granted' && 'Notification' in window) {
+    el.innerHTML = `
+      <div class="note-banner">
+        <div>🔔</div>
+        <div>Уведомления не разрешены. <b>Настройки → Разрешить уведомления</b>.</div>
+      </div>`;
+  } else {
+    el.innerHTML = '';
+  }
+}
+
+/* ============================================================
+   EXPORT / IMPORT
+   ============================================================ */
+document.getElementById('btnExport').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(DATA, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'vlad-tracker-' + todayISO() + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('📤 Файл сохранён');
+});
+
+document.getElementById('btnImport').addEventListener('click', () => {
+  document.getElementById('fileImport').click();
+});
+document.getElementById('fileImport').addEventListener('change', e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const d = JSON.parse(r.result);
+      if (!d.profile || !d.entries) throw new Error('Неверный формат');
+      if (!confirm('Заменить все текущие данные?')) return;
+      DATA = d;
+      DATA.profile = Object.assign(defaultData().profile, d.profile);
+      DATA.settings = Object.assign(defaultData().settings, d.settings);
+      save(DATA);
+      loadSettings();
+      renderAll();
+      toast('✅ Данные загружены');
+    } catch (err) {
+      toast('Ошибка: ' + err.message);
+    }
+  };
+  r.readAsText(f);
+});
+
+document.getElementById('btnClear').addEventListener('click', () => {
+  if (confirm('Удалить ВСЁ? Действие необратимо.')) {
+    if (confirm('Точно? Лучше сначала выгрузи JSON.')) {
+      localStorage.removeItem(KEY);
+      DATA = load();
+      loadSettings();
+      renderAll();
+      toast('Всё удалено');
+    }
+  }
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+document.getElementById('addDate').textContent = dateRu(todayISO());
+loadSettings();
+renderAll();
+
+setTimeout(() => {
+  const arr = sortedEntries();
+  if (arr.length) {
+    const last = arr[arr.length-1];
+    const gap = daysBetween(last.date, todayISO());
+    if (gap >= 3 && DATA.settings.scold) {
+      toast(`💀 Пропуск ${gap} дней. Пора вернуться.`, 3500);
+    }
+  }
+}, 800);
+
+/* Service worker */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => reg.update())
+      .catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="План Влада">
+<meta name="theme-color" content="#0a0e17">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%230a0e17'/><text x='96' y='128' font-size='110' text-anchor='middle' font-family='-apple-system' font-weight='900' fill='%233b82f6'>В</text></svg>">
+<title>План Влада — 28 недель</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0a0e17; --card:#131a28; --card2:#1a2338; --border:#2a3550;
+  --text:#e6ecf5; --muted:#93a1bd;
+  --p1:#3b82f6; --p2:#10b981; --p3:#f59e0b; --p4:#ef4444; --gold:#fbbf24;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bot:env(safe-area-inset-bottom,0px);
+}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{
+  background:radial-gradient(1200px 600px at 50% -100px,#1a2340 0%,var(--bg) 60%) fixed;
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Inter",system-ui,sans-serif;
+  line-height:1.55;font-size:16px;
+  padding:calc(20px + var(--safe-top)) 14px calc(90px + var(--safe-bot));
+  min-height:100vh;overflow-x:hidden;
+}
+.wrap{max-width:1100px;margin:0 auto}
+
+/* ===== Mobile bottom nav ===== */
+.mnav{
+  position:fixed;bottom:0;left:0;right:0;z-index:50;
+  background:rgba(10,14,23,.92);backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border-top:1px solid var(--border);
+  padding:8px 8px calc(8px + var(--safe-bot));
+  display:grid;grid-template-columns:repeat(5,1fr);gap:4px;
+}
+.mnav a{
+  text-decoration:none;color:var(--muted);
+  font-size:10px;text-align:center;padding:6px 2px;border-radius:10px;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  transition:.2s;
+}
+.mnav a .ic{font-size:20px;line-height:1}
+.mnav a:active{background:rgba(59,130,246,.15);color:#fff}
+
+/* ===== Hero ===== */
+.hero{
+  background:linear-gradient(135deg,#1a2338 0%,#0f1626 100%);
+  border:1px solid var(--border);border-radius:18px;
+  padding:28px 20px;position:relative;overflow:hidden;
+}
+.hero::before{content:"";position:absolute;inset:0;
+  background:radial-gradient(600px 300px at 90% 0%,rgba(59,130,246,.18),transparent 70%);
+  pointer-events:none}
+.hero h1{
+  font-size:clamp(22px,6vw,38px);font-weight:800;
+  letter-spacing:-.02em;margin-bottom:6px;
+  background:linear-gradient(90deg,#fff,#93a1bd);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  position:relative;
+}
+.hero .sub{color:var(--muted);font-size:13px;margin-bottom:20px;position:relative}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;position:relative}
+.stat{background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:10px;padding:10px 12px}
+.stat .lbl{font-size:10px;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--muted);margin-bottom:3px}
+.stat .val{font-size:15px;font-weight:700}
+.stat .val.good{color:#34d399}.stat .val.warn{color:#fbbf24}
+.stat .val.bad{color:#f87171}
+@media(min-width:640px){
+  .hero{padding:40px 32px}
+  .stats{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+  .stat{padding:14px 16px}
+  .stat .lbl{font-size:11px}
+  .stat .val{font-size:18px}
+}
+
+/* ===== Goals ===== */
+.goals{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+@media(min-width:640px){.goals{grid-template-columns:repeat(4,1fr);gap:14px}}
+.goal{background:linear-gradient(160deg,var(--card2),var(--card));
+  border:1px solid var(--border);border-radius:12px;padding:14px;
+  position:relative;overflow:hidden}
+.goal::after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold)}
+.goal .g-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.goal .g-val{font-size:18px;font-weight:800;margin-top:3px;color:var(--gold);line-height:1.15}
+.goal .g-note{font-size:11px;color:var(--muted);margin-top:3px}
+@media(min-width:640px){
+  .goal{padding:18px 20px}
+  .goal .g-val{font-size:24px}
+}
+
+/* ===== Sections ===== */
+section{margin-top:36px}
+@media(min-width:640px){section{margin-top:48px}}
+h2{font-size:19px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+@media(min-width:640px){h2{font-size:22px}}
+h2 .num{display:inline-flex;align-items:center;justify-content:center;
+  width:28px;height:28px;border-radius:8px;
+  background:linear-gradient(135deg,#3b82f6,#6366f1);
+  font-size:13px;font-weight:800;flex-shrink:0}
+.hint{color:var(--muted);font-size:13px;margin-bottom:16px}
+
+/* ===== Chart ===== */
+.chart-card{background:var(--card);border:1px solid var(--border);
+  border-radius:14px;padding:12px;overflow:hidden}
+.chart-card svg{width:100%;height:auto;display:block}
+@media(min-width:640px){.chart-card{padding:20px}}
+
+/* ===== Motivation ===== */
+.motiv{
+  background:linear-gradient(160deg,#1a2338,#0f1626);
+  border:1px solid var(--border);border-radius:16px;padding:20px;
+  position:relative;overflow:hidden;
+}
+.motiv::before{content:"";position:absolute;inset:0;
+  background:radial-gradient(500px 250px at 0% 100%,rgba(251,191,36,.1),transparent 70%);
+  pointer-events:none}
+.motiv .block{position:relative;margin-bottom:16px}
+.motiv .block:last-child{margin-bottom:0}
+.motiv h3{font-size:15px;color:var(--gold);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.motiv p{font-size:14px;color:#dbe4f0;margin-bottom:6px}
+.motiv .anchors{list-style:none;padding:0;counter-reset:a}
+.motiv .anchors li{
+  padding:10px 14px;background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:10px;font-size:13.5px;margin-bottom:6px;
+  color:#e6ecf5;font-weight:500;
+}
+.motiv .anchors li::before{
+  counter-increment:a;content:counter(a);
+  display:inline-flex;align-items:center;justify-content:center;
+  width:22px;height:22px;border-radius:6px;background:var(--gold);color:#0a0e17;
+  font-weight:800;font-size:12px;margin-right:10px;vertical-align:middle;
+}
+
+/* ===== Phases ===== */
+.phases{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:640px){.phases{grid-template-columns:repeat(2,1fr);gap:14px}}
+@media(min-width:900px){.phases{grid-template-columns:repeat(4,1fr)}}
+.phase{background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:14px;border-top:3px solid var(--c)}
+.phase.p1{--c:var(--p1)}.phase.p2{--c:var(--p2)}
+.phase.p3{--c:var(--p3)}.phase.p4{--c:var(--p4)}
+.phase .ph-name{font-size:11px;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--c);font-weight:700}
+.phase .ph-title{font-size:16px;font-weight:700;margin:5px 0 3px}
+.phase .ph-date{font-size:11px;color:var(--muted);margin-bottom:9px}
+.phase ul{list-style:none;font-size:13px;color:#cbd5e1}
+.phase ul li{padding-left:14px;position:relative;margin-bottom:3px}
+.phase ul li::before{content:"›";position:absolute;left:0;color:var(--c);font-weight:700}
+
+/* ===== Week template ===== */
+.week-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(min-width:640px){.week-grid{grid-template-columns:repeat(4,1fr);gap:10px}}
+@media(min-width:900px){.week-grid{grid-template-columns:repeat(7,1fr)}}
+.day{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+.day .dn{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.day .dt{font-weight:700;font-size:13px;margin-top:3px;color:#fff}
+.day .dd{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.45}
+
+/* ===== Weeks details ===== */
+.weeks{display:flex;flex-direction:column;gap:8px}
+details.week{background:var(--card);border:1px solid var(--border);
+  border-left:4px solid var(--c,#64748b);border-radius:12px;overflow:hidden}
+details.week[open]{background:var(--card2)}
+details.week summary{cursor:pointer;padding:12px 14px;
+  display:flex;align-items:center;gap:10px;list-style:none;user-select:none}
+details.week summary::-webkit-details-marker{display:none}
+details.week summary::after{content:"＋";margin-left:auto;color:var(--muted);
+  font-size:18px;transition:.2s}
+details.week[open] summary::after{content:"−";color:var(--c)}
+.wk-num{display:inline-flex;align-items:center;justify-content:center;
+  min-width:42px;height:30px;border-radius:8px;
+  background:rgba(255,255,255,.05);color:var(--c);
+  font-weight:800;font-size:12px;flex-shrink:0}
+.wk-title{font-weight:700;font-size:14px;flex:1;min-width:0}
+.wk-dates{font-size:11px;color:var(--muted);flex-shrink:0}
+@media(max-width:520px){.wk-dates{display:none}}
+.wk-body{padding:0 14px 14px 14px;display:grid;gap:0}
+.wk-row{display:grid;grid-template-columns:1fr;gap:4px;font-size:13px;
+  padding:8px 0;border-top:1px dashed rgba(255,255,255,.06)}
+@media(min-width:560px){.wk-row{grid-template-columns:80px 1fr;gap:10px;align-items:start}}
+.wk-row .k{color:var(--muted);font-size:11px;text-transform:uppercase;
+  letter-spacing:.06em;padding-top:1px}
+.wk-row .v{color:#dbe4f0;line-height:1.5}
+.wk-row .v b{color:#fff}
+
+/* ===== Technique ===== */
+.tech-grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:640px){.tech-grid{grid-template-columns:repeat(2,1fr);gap:14px}}
+@media(min-width:900px){.tech-grid{grid-template-columns:repeat(3,1fr)}}
+.tech{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}
+.tech h3{font-size:14px;margin-bottom:8px;color:#fff}
+.tech ol{font-size:13px;color:#cbd5e1;padding-left:18px}
+.tech ol li{margin-bottom:3px}
+
+/* ===== Nutrition ===== */
+.nutr{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:700px){.nutr{grid-template-columns:1fr 1fr}}
+.nutr-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.nutr-card h3{font-size:14px;margin-bottom:10px;color:var(--gold)}
+.nutr-card table{width:100%;font-size:13px;border-collapse:collapse}
+.nutr-card table td{padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.nutr-card table td:last-child{text-align:right;color:#fff;font-weight:600}
+.meal{font-size:13px;color:#cbd5e1;padding:4px 0}
+.meal b{color:#fff}
+
+/* ===== Shoes ===== */
+.shoe-grid{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:640px){.shoe-grid{grid-template-columns:1fr 1fr}}
+.shoe{background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:14px;border-left:3px solid var(--gold)}
+.shoe h4{font-size:14px;color:#fff;margin-bottom:4px}
+.shoe p{font-size:12.5px;color:#cbd5e1}
+.shoe .tag{display:inline-block;font-size:10px;padding:2px 8px;border-radius:6px;
+  background:rgba(251,191,36,.15);color:var(--gold);margin-top:6px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.05em}
+
+/* ===== Reporting ===== */
+.report-grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:700px){.report-grid{grid-template-columns:repeat(3,1fr)}}
+.rep-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.rep-card h3{font-size:14px;color:#fff;margin-bottom:10px;display:flex;gap:8px;align-items:center}
+.rep-card h3 .badge{font-size:10px;padding:2px 8px;border-radius:6px;font-weight:700;text-transform:uppercase}
+.badge.daily{background:rgba(59,130,246,.18);color:#60a5fa}
+.badge.weekly{background:rgba(16,185,129,.18);color:#34d399}
+.badge.monthly{background:rgba(239,68,68,.18);color:#f87171}
+.rep-card ul{list-style:none;font-size:13px;color:#cbd5e1}
+.rep-card ul li{padding:5px 0;border-bottom:1px dashed rgba(255,255,255,.05);
+  display:flex;justify-content:space-between;gap:10px}
+.rep-card ul li:last-child{border-bottom:none}
+.rep-card ul li span:last-child{color:var(--muted);font-size:11.5px}
+
+/* ===== Apps ===== */
+.apps{display:grid;grid-template-columns:1fr;gap:8px}
+@media(min-width:640px){.apps{grid-template-columns:1fr 1fr}}
+.app-row{display:flex;gap:12px;align-items:center;background:var(--card);
+  border:1px solid var(--border);border-radius:10px;padding:10px 14px}
+.app-row .ai{width:36px;height:36px;border-radius:9px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+  background:linear-gradient(135deg,#3b82f6,#6366f1)}
+.app-row .an{font-weight:700;font-size:14px;color:#fff}
+.app-row .ad{font-size:11.5px;color:var(--muted);margin-top:2px}
+
+/* ===== Checkpoints table ===== */
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;
+  border-radius:12px;border:1px solid var(--border)}
+table.check{width:100%;border-collapse:collapse;background:var(--card);font-size:13px;min-width:480px}
+table.check th,table.check td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+table.check th{background:var(--card2);font-size:10.5px;text-transform:uppercase;
+  letter-spacing:.06em;color:var(--muted);font-weight:700}
+table.check tr:last-child td{border-bottom:none}
+table.check td:first-child{color:var(--muted)}
+table.check td{color:#fff}
+table.check tr.final td{background:linear-gradient(90deg,rgba(251,191,36,.08),transparent)}
+table.check tr.final td:last-child{color:var(--gold);font-weight:700}
+
+/* ===== Rules ===== */
+.rules{background:linear-gradient(160deg,#1a1216,#0f0a0e);
+  border:1px solid #3a1d22;border-radius:14px;padding:18px}
+.rules h3{color:#f87171;margin-bottom:12px;font-size:15px}
+.rules ol{padding-left:20px}
+.rules li{padding:4px 0;color:#e0e7f0;font-size:13.5px}
+
+/* ===== Footer ===== */
+.footer{text-align:center;color:var(--muted);font-size:12.5px;
+  margin-top:50px;padding-top:18px;border-top:1px solid var(--border)}
+.footer .big{color:var(--gold);font-weight:700;display:block;margin-top:4px}
+</style>
+</head>
+<body id="top">
+<div class="wrap">
+
+<!-- ================= HERO ================= -->
+<div class="hero">
+  <h1>План Влада</h1>
+  <div class="sub">14.10.2026 → 01.05.2027 · 28 недель · 200 дней</div>
+  <div class="stats">
+    <div class="stat"><div class="lbl">Возраст</div><div class="val">21 год</div></div>
+    <div class="stat"><div class="lbl">Рост / Вес</div><div class="val">178 / ~100 кг</div></div>
+    <div class="stat"><div class="lbl">BMI</div><div class="val bad">31.6 · ожирение I</div></div>
+    <div class="stat"><div class="lbl">Лишнего</div><div class="val warn">−21 кг мин.</div></div>
+    <div class="stat"><div class="lbl">Цель по весу</div><div class="val good">75–78 кг</div></div>
+    <div class="stat"><div class="lbl">Дедлайн</div><div class="val warn">01.05.2027</div></div>
+  </div>
+
+  <div class="goals">
+    <div class="goal"><div class="g-lbl">Подтягивания</div><div class="g-val">15+</div><div class="g-note">сейчас 0</div></div>
+    <div class="goal"><div class="g-lbl">1 км</div><div class="g-val">&lt;4:00</div><div class="g-note">сейчас 200 м</div></div>
+    <div class="goal"><div class="g-lbl">100 м</div><div class="g-val">≤14.0с</div><div class="g-note">спринт</div></div>
+    <div class="goal"><div class="g-lbl">Срок</div><div class="g-val">28 нед</div><div class="g-note">без поблажек</div></div>
+  </div>
+</div>
+
+<!-- ================= MOTIVATION ================= -->
+<section id="motiv">
+  <h2><span class="num">★</span> Мотивация для слабого</h2>
+  <div class="hint">Мотивация — не приходит. Её создают.</div>
+
+  <div class="motiv">
+    <div class="block">
+      <h3>⚡ Правило 2 минут</h3>
+      <p>Не можешь выйти на улицу — выйди на 2 минуты. Дойди до турника и повиси. Всё. Мозг обмануть проще, чем себя заставлять.</p>
+    </div>
+
+    <div class="block">
+      <h3>🔗 Привяжи к привычке</h3>
+      <p>Возвращаешься домой — 1 подход на турнике. Триггер: «я дома → я сделал». Так формируется автоматизм.</p>
+    </div>
+
+    <div class="block">
+      <h3>📓 Дневник = топливо</h3>
+      <p>Каждая тренировка — запись. Прогресс — единственная честная мотивация.</p>
+    </div>
+
+    <div class="block">
+      <h3>🎯 Дисциплина важнее мотивации</h3>
+      <p>Мотивация кончится через 2 недели. Дисциплина останется. Относись к тренировке как к рабочей задаче: дедлайн, план, отчёт.</p>
+    </div>
+
+    <div class="block">
+      <h3>🔥 7 якорей — вбей в голову</h3>
+      <ul class="anchors">
+        <li>100 кг в 21 год — это не приговор, это стартовая точка.</li>
+        <li>Не хочется — сделай 2 минуты. Всё.</li>
+        <li>Булочка сейчас — минус подтягивание завтра.</li>
+        <li>Ты не слабый. Ты нетренированный. Это разные вещи.</li>
+        <li>Дисциплина важнее мотивации. Мотивация кончится — дисциплина нет.</li>
+        <li>Через 28 недель ты либо 75 кг и 15 подтягиваний, либо 100 кг и 0. Выбор каждый день.</li>
+        <li>Никто не придёт и не сделает это за тебя. Никто.</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <h3>🚶 Машина — главный враг</h3>
+      <p>Ты ездишь, а не ходишь. Метаболизм убит не едой — обездвиженностью.</p>
+      <p><b>Правила:</b> парковка в 15 мин от работы · лестница вместо лифта · звонки на ходу · аудиокнига только в наушниках на улице · прогулка-обед 30 мин · выходные без машины.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= WEIGHT CHART ================= -->
+<section>
+  <h2><span class="num">1</span> График веса</h2>
+  <div class="hint">Цель: −0.85 кг в неделю. Один срыв — нагоняешь.</div>
+  <div class="chart-card">
+    <svg viewBox="0 0 820 280" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#ef4444"/><stop offset="35%" stop-color="#f59e0b"/>
+          <stop offset="70%" stop-color="#10b981"/><stop offset="100%" stop-color="#3b82f6"/>
+        </linearGradient>
+        <linearGradient id="fillGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#3b82f6" stop-opacity=".35"/>
+          <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <g stroke="rgba(255,255,255,.06)" stroke-width="1">
+        <line x1="60" y1="30" x2="780" y2="30"/><line x1="60" y1="61" x2="780" y2="61"/>
+        <line x1="60" y1="93" x2="780" y2="93"/><line x1="60" y1="125" x2="780" y2="125"/>
+        <line x1="60" y1="156" x2="780" y2="156"/><line x1="60" y1="188" x2="780" y2="188"/>
+        <line x1="60" y1="220" x2="780" y2="220"/>
+      </g>
+      <g fill="#93a1bd" font-size="11" font-family="system-ui" text-anchor="end">
+        <text x="50" y="34">100</text><text x="50" y="65">95</text>
+        <text x="50" y="97">90</text><text x="50" y="129">85</text>
+        <text x="50" y="160">80</text><text x="50" y="192">75</text>
+        <text x="50" y="224">70</text>
+      </g>
+      <g fill="#93a1bd" font-size="11" font-family="system-ui" text-anchor="middle">
+        <text x="60" y="245">W0</text><text x="162" y="245">W4</text>
+        <text x="265" y="245">W8</text><text x="368" y="245">W12</text>
+        <text x="471" y="245">W16</text><text x="574" y="245">W20</text>
+        <text x="677" y="245">W24</text><text x="780" y="245">W28</text>
+      </g>
+      <text x="420" y="270" fill="#6b7896" font-size="11" text-anchor="middle" font-family="system-ui">недели</text>
+      <path d="M60,30 L162,55 L265,81 L368,106 L471,131 L574,150 L677,169 L780,182 L780,220 L60,220 Z" fill="url(#fillGrad)"/>
+      <path d="M60,30 L162,55 L265,81 L368,106 L471,131 L574,150 L677,169 L780,182"
+        fill="none" stroke="url(#lineGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="60" cy="30" r="6" fill="#0a0e17" stroke="#ef4444" stroke-width="3"/>
+      <circle cx="162" cy="55" r="5" fill="#0a0e17" stroke="#f97316" stroke-width="3"/>
+      <circle cx="265" cy="81" r="5" fill="#0a0e17" stroke="#f59e0b" stroke-width="3"/>
+      <circle cx="368" cy="106" r="5" fill="#0a0e17" stroke="#eab308" stroke-width="3"/>
+      <circle cx="471" cy="131" r="5" fill="#0a0e17" stroke="#84cc16" stroke-width="3"/>
+      <circle cx="574" cy="150" r="5" fill="#0a0e17" stroke="#10b981" stroke-width="3"/>
+      <circle cx="677" cy="169" r="5" fill="#0a0e17" stroke="#14b8a6" stroke-width="3"/>
+      <circle cx="780" cy="182" r="7" fill="#0a0e17" stroke="#3b82f6" stroke-width="3"/>
+      <g font-size="11" font-family="system-ui" font-weight="700" fill="#fff" text-anchor="middle">
+        <text x="60" y="20">100</text><text x="162" y="45">96</text>
+        <text x="265" y="71">92</text><text x="368" y="96">88</text>
+        <text x="471" y="121">84</text><text x="574" y="140">81</text>
+        <text x="677" y="159">78</text><text x="780" y="172">76</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- ================= PHASES ================= -->
+<section>
+  <h2><span class="num">2</span> Четыре фазы</h2>
+  <div class="hint">Каждая фаза — своя задача. Не перескакивай.</div>
+  <div class="phases">
+    <div class="phase p1">
+      <div class="ph-name">Фаза I</div><div class="ph-title">База</div>
+      <div class="ph-date">14.10 → 01.12 · 7 недель</div>
+      <ul><li>Вис, лопатки, негативы</li><li>Ходьба + бег-интервалы</li><li>−4…−6 кг</li></ul>
+    </div>
+    <div class="phase p2">
+      <div class="ph-name">Фаза II</div><div class="ph-title">Объём</div>
+      <div class="ph-date">02.12 → 02.02 · 9 недель</div>
+      <ul><li>Подтягивания в объём</li><li>Непрерывный бег 20–30 мин</li><li>−6…−8 кг</li></ul>
+    </div>
+    <div class="phase p3">
+      <div class="ph-name">Фаза III</div><div class="ph-title">Сила и скорость</div>
+      <div class="ph-date">03.02 → 30.03 · 8 недель</div>
+      <ul><li>Подтягивания с весом</li><li>400 м, 600 м, спринты</li><li>−5…−6 кг</li></ul>
+    </div>
+    <div class="phase p4">
+      <div class="ph-name">Фаза IV</div><div class="ph-title">Пик и тест</div>
+      <div class="ph-date">31.03 → 01.05 · 4 недели</div>
+      <ul><li>Объём вниз, интенсивность вверх</li><li>Контрольные тесты</li><li>−2…−3 кг</li></ul>
+    </div>
+  </div>
+</section>
+
+<!-- ================= WEEK TEMPLATE ================= -->
+<section>
+  <h2><span class="num">3</span> Типовая неделя</h2>
+  <div class="hint">Каркас, который повторяется. Наполнение — по неделям.</div>
+  <div class="week-grid">
+    <div class="day"><div class="dn">Пн</div><div class="dt">Турник + верх</div><div class="dd">Подтягивания, отжимания, планка + ходьба 30 мин</div></div>
+    <div class="day"><div class="dn">Вт</div><div class="dt">Спринты</div><div class="dd">Разминка 15 мин, ускорения 30–60 м, пресс</div></div>
+    <div class="day"><div class="dn">Ср</div><div class="dt">Ходьба</div><div class="dd">40–60 мин быстрым шагом + растяжка 10 мин</div></div>
+    <div class="day"><div class="dn">Чт</div><div class="dt">Турник + темп</div><div class="dd">Подтягивания + бег в темпе (по фазе)</div></div>
+    <div class="day"><div class="dn">Пт</div><div class="dt">Ноги + спринт</div><div class="dd">Приседания, выпады, техника, 4×60 м</div></div>
+    <div class="day"><div class="dn">Сб</div><div class="dt">Длинная</div><div class="dd">Лёгкий бег/ходьба 30–50 мин, растяжка</div></div>
+    <div class="day"><div class="dn">Вс</div><div class="dt">Отдых</div><div class="dd">Растяжка, сон, взвешивание, план на неделю</div></div>
+  </div>
+</section>
+
+<!-- ================= WEEKS ================= -->
+<section id="weeks">
+  <h2><span class="num">4</span> 28 недель — пошагово</h2>
+  <div class="hint">Кликни по неделе — раскроется.</div>
+
+  <!-- PHASE 1 -->
+  <div class="weeks" style="--c:#3b82f6">
+    <details class="week" open>
+      <summary><span class="wk-num">W1</span><span class="wk-title">Старт. Диагностика</span><span class="wk-dates">14.10 – 20.10</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">Вис 3×max (до 30 сек), лопаточные 3×5, негативы 3×3 (5 сек), австралийские 3×8. <b>Каждый день</b>.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">3 раза: 5 мин ходьба + 8×(1 мин медл. бег / 2 мин ходьба) + 5 мин ходьба. Пульс ≤150.</div></div>
+        <div class="wk-row"><div class="k">Сила</div><div class="v">Отжимания 3×max, планка 3×30 сек, приседания 3×15.</div></div>
+        <div class="wk-row"><div class="k">Питание</div><div class="v">2000–2100 ккал, белок 160 г. Убрать булки и сладкие йогурты. Вода 2.5 л.</div></div>
+        <div class="wk-row"><div class="k">Вес</div><div class="v">Фото, замеры груди/живота/бёдер. Взвешивание каждое утро.</div></div>
+        <div class="wk-row"><div class="k">Шаги</div><div class="v">8 000 в день.</div></div>
+      </div>
+    </details>
+    <details class="week">
+      <summary><span class="wk-num">W2</span><span class="wk-title">Закрепление базы</span><span class="wk-dates">21.10 – 27.10</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">Вис 4×max, лопаточные 3×6, негативы 3×4 (6 сек), австралийские 3×10.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">3 раза: 5 мин ходьба + 8×(1 / 2 мин) + 5 мин. Один раз — 40 мин ходьбы.</div></div>
+        <div class="wk-row"><div class="k">Сила</div><div class="v">Отжимания 4×max, планка 3×40, приседания 3×20.</div></div>
+        <div class="wk-row"><div class="k">Питание</div><div class="v">2000 ккал, белок 170 г.</div></div>
+        <div class="wk-row"><div class="k">Шаги</div><div class="v">9 000 в день.</div></div>
+      </div>
+    </details>
+    <details class="week">
+      <summary><span class="wk-num">W3</span><span class="wk-title">Первое подтягивание</span><span class="wk-dates">28.10 – 03.11</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">Пробуешь <b>1 чистое</b> каждый день. Австралийские 3×12, негативы 4×4 (6 сек), вис 3×45 сек.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">3 раза: 6×(2 мин бег / 2 мин ходьба). Ходьба 40 мин в среду.</div></div>
+        <div class="wk-row"><div class="k">Сила</div><div class="v">Отжимания 4×max, планка 3×45, приседания 3×25, выпады 3×10/нога.</div></div>
+        <div class="wk-row"><div class="k">Питание</div><div class="v">1950–2050 ккал. Углеводы вокруг бега.</div></div>
+        <div class="wk-row"><div class="k">Шаги</div><div class="v">10 000 в день.</div></div>
+      </div>
+    </details>
+    <details class="week">
+      <summary><span class="wk-num">W4</span><span class="wk-title">Развитие + тест</span><span class="wk-dates">04.11 – 10.11</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">Негативы 4×5, австралийские 4×10, вис 3×60 сек. Пробуешь 1–2 чистых ежедневно.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">3 раза: 5×(3 мин бег / 2 мин ходьба). Спринт-техника: A-skip 3×20 м.</div></div>
+        <div class="wk-row"><div class="k">Сила</div><div class="v">Отжимания 4×max, планка 3×50, приседания 4×20.</div></div>
+        <div class="wk-row"><div class="k">Питание</div><div class="v">1950 ккал, белок 175 г.</div></div>
+        <div class="wk-row"><div class="k">Контроль</div><div class="v"><b>Тест W4:</b> вес, подтягивания, 1 км на время, вис.</div></div>
+      </div>
+    </details>
+    <details class="week">
+      <summary><span class="wk-num">W5</span><span class="wk-title">Дыхалка</span><span class="wk-dates">11.11 – 17.11</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">Лестница 1-2-1-2-1. Австралийские 4×12.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">3 раза: 4×(5 мин бег / 1 мин ходьба). Один раз 1 км на время.</div></div>
+        <div class="wk-row"><div class="k">Сила</div><div class="v">Отжимания 5×max, планка 3×60, приседания 4×25.</div></div>
+        <div class="wk-row"><div class="k">Питание</div><div class="v">1950 ккал.</div></div>
+      </div>
+    </details>
+    <details class="week">
+      <summary><span class="wk-num">W6</span><span class="wk-title">Объём турника</span><span class="wk-dates">18.11 – 24.11</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">50 подтягиваний в день в подходах по 2–3 / негативы. GTG-метод.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">3 раза: 3×1 км по 6:00–6:30, отдых 3 мин.</div></div>
+        <div class="wk-row"><div class="k">Сила</div><div class="v">Отжимания 5×max, планка 3×60, выпады 3×15/нога.</div></div>
+        <div class="wk-row"><div class="k">Питание</div><div class="v">1900 ккал, белок 180 г.</div></div>
+      </div>
+    </details>
+    <details class="week">
+      <summary><span class="wk-num">W7</span><span class="wk-title">Конец фазы I — тест</span><span class="wk-dates">25.11 – 01.12</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">Лёгкая неделя. Тест: макс чистых, вис. Ожидание: <b>2–3</b>.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">Тест: 1 км на время. Ожидание: <b>7:00–7:30</b>.</div></div>
+        <div class="wk-row"><div class="k">Итог</div><div class="v">Вес ≤95 кг, 2–3 подтягивания, 1 км ≤7:30.</div></div>
+      </div>
+    </details>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="weeks" style="--c:#10b981;margin-top:10px">
+    <details class="week">
+      <summary><span class="wk-num">W8</span><span class="wk-title">Объёмная фаза</span><span class="wk-dates">02.12 – 08.12</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">Лестница 1-2-3-2-1. 60 подтягиваний в день. Отжимания 5×max.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">4 раза: лёгкий 20 мин + 6×200 м / 90 сек отдых.</div></div>
+        <div class="wk-row"><div class="k">Спринт</div><div class="v">6×30 м + 4×60 м.</div></div>
+        <div class="wk-row"><div class="k">Питание</div><div class="v">1900 ккал.</div></div>
+      </div>
+    </details>
+    <details class="week">
+      <summary><span class="wk-num">W9</span><span class="wk-title">+1 подтягивание</span><span class="wk-dates">09.12 – 15.12</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">Лестница 1-2-3-3-2-1. 70 в день. Тест макс 1 раз в неделю.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">4 раза: 25 мин лёгкий + 5×400 м по 1:55–2:00.</div></div>
+        <div class="wk-row"><div class="k">Питание</div><div class="v">1850 ккал, белок 180 г.</div></div>
+      </div>
+    </details>
+    <details class="week">
+      <summary><span class="wk-num">W10</span><span class="wk-title">Хват</span><span class="wk-dates">16.12 – 22.12</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">4×4 + лестница до 4. Вис с полотенцем 3×30 сек. Австралийские 4×12.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">4 раза: 30 мин + 4×600 м по 3:00.</div></div>
+        <div class="wk-row"><div class="k">Питание</div><div class="v">1850 ккал.</div></div>
+      </div>
+    </details>
+    <details class="week">
+      <summary><span class="wk-num">W11</span><span class="wk-title">Объём 80+</span><span class="wk-dates">23.12 – 29.12</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">80 в день, подходы 4–5. Тест макс: <b>5–6</b>.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">4 раза: 30 мин + 6×200 м по 50 сек.</div></div>
+        <div class="wk-row"><div class="k">Питание</div><div class="v">1800 ккал. Праздники без торта. Алкоголь — нет.</div></div>
+      </div>
+    </details>
+    <details class="week">
+      <summary><span class="wk-num">W12</span><span class="wk-title">Тест середины</span><span class="wk-dates">30.12 – 05.01</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">Разгрузка. Тест макс: <b>6–7</b>.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">Тест 1 км: <b>5:45–6:15</b>.</div></div>
+        <div class="wk-row"><div class="k">Итог</div><div class="v">Вес ≤89 кг.</div></div>
+      </div>
+    </details>
+    <details class="week">
+      <summary><span class="wk-num">W13</span><span class="wk-title">Объём 100</span><span class="wk-dates">06.01 – 12.01</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">100 в день, подходы по 5. Отжимания 6×max.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">4 раза: 35 мин + 4×1 км по 5:00.</div></div>
+        <div class="wk-row"><div class="k">Спринт</div><div class="v">6×60 м, 3×100 м.</div></div>
+        <div class="wk-row"><div class="k">Питание</div><div class="v">1800 ккал.</div></div>
+      </div>
+    </details>
+    <details class="week">
+      <summary><span class="wk-num">W14</span><span class="wk-title">Сила спины</span><span class="wk-dates">13.01 – 19.01</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">5×5 с паузой внизу. Выходы на одну. Пробуй 8 чистых.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">4 раза: 3×1 км по 4:45.</div></div>
+        <div class="wk-row"><div class="k">Питание</div><div class="v">1750–1800 ккал, белок 180 г.</div></div>
+      </div>
+    </details>
+    <details class="week">
+      <summary><span class="wk-num">W15</span><span class="wk-title">Цель — 10</span><span class="wk-dates">20.01 – 26.01</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">Лестница до 6. Тест макс: <b>8–9</b>.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">4 раза: 4×800 м по 3:45 + 6×200 м по 48.</div></div>
+        <div class="wk-row"><div class="k">Спринт</div><div class="v">8×30 м, 4×60 м.</div></div>
+        <div class="wk-row"><div class="k">Питание</div><div class="v">1750 ккал.</div></div>
+      </div>
+    </details>
+    <details class="week">
+      <summary><span class="wk-num">W16</span><span class="wk-title">Конец фазы II</span><span class="wk-dates">27.01 – 02.02</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">Разгрузка. Тест макс: <b>10</b>.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">Тест 1 км: <b>5:00–5:30</b>.</div></div>
+        <div class="wk-row"><div class="k">Итог</div><div class="v">Вес ≤85 кг.</div></div>
+      </div>
+    </details>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="weeks" style="--c:#f59e0b;margin-top:10px">
+    <details class="week">
+      <summary><span class="wk-num">W17</span><span class="wk-title">Силовая фаза</span><span class="wk-dates">03.02 – 09.02</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">5×5 с +5 кг (рюкзак). Без веса — 3×8.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">5 раз: 5×400 м по 1:35–1:40, отдых 2 мин.</div></div>
+        <div class="wk-row"><div class="k">Спринт</div><div class="v">6×60 м на 95%.</div></div>
+        <div class="wk-row"><div class="k">Питание</div><div class="v">1750 ккал.</div></div>
+      </div>
+    </details>
+    <details class="week">
+      <summary><span class="wk-num">W18</span><span class="wk-title">Скоростная выносливость</span><span class="wk-dates">10.02 – 16.02</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">Лестница 1-2-3-4-5-4-3-2-1. Выходы на две руки.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">5 раз: 3×600 м по 2:20.</div></div>
+        <div class="wk-row"><div class="k">Питание</div><div class="v">1700–1750 ккал.</div></div>
+      </div>
+    </details>
+    <details class="week">
+      <summary><span class="wk-num">W19</span><span class="wk-title">Цель — 12</span><span class="wk-dates">17.02 – 23.02</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">5×5 +5 кг. Тест макс: <b>12</b>.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">5 раз: 4×400 м по 1:30.</div></div>
+        <div class="wk-row"><div class="k">Питание</div><div class="v">1700 ккал.</div></div>
+      </div>
+    </details>
+    <details class="week">
+      <summary><span class="wk-num">W20</span><span class="wk-title">Рекорд</span><span class="wk-dates">24.02 – 02.03</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">6×5 +5 кг. Тест макс: <b>12–13</b>.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">Тест 1 км: <b>4:45–5:00</b>.</div></div>
+        <div class="wk-row"><div class="k">Итог</div><div class="v">Вес ≤81 кг.</div></div>
+      </div>
+    </details>
+    <details class="week">
+      <summary><span class="wk-num">W21</span><span class="wk-title">Мощность</span><span class="wk-dates">03.03 – 09.03</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">5×5 +7 кг. 3×max без веса.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">5 раз: 3×800 м по 3:10.</div></div>
+        <div class="wk-row"><div class="k">Спринт</div><div class="v">4×100 м на 95%.</div></div>
+        <div class="wk-row"><div class="k">Питание</div><div class="v">1700 ккал.</div></div>
+      </div>
+    </details>
+    <details class="week">
+      <summary><span class="wk-num">W22</span><span class="wk-title">13–14</span><span class="wk-dates">10.03 – 16.03</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">5×6 +5 кг. Тест макс: <b>13–14</b>.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">5 раз: 5×400 м по 1:30.</div></div>
+        <div class="wk-row"><div class="k">Питание</div><div class="v">1700 ккал, белок 185 г.</div></div>
+      </div>
+    </details>
+    <details class="week">
+      <summary><span class="wk-num">W23</span><span class="wk-title">Пик силы</span><span class="wk-dates">17.03 – 23.03</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">4×6 +7 кг. Тест макс: <b>14–15</b>.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">4×600 м по 2:15 + 6×200 м по 45.</div></div>
+        <div class="wk-row"><div class="k">Спринт</div><div class="v">Тест 100 м: <b>14.5–15.0</b>.</div></div>
+        <div class="wk-row"><div class="k">Питание</div><div class="v">1650–1700 ккал.</div></div>
+      </div>
+    </details>
+    <details class="week">
+      <summary><span class="wk-num">W24</span><span class="wk-title">Конец фазы III</span><span class="wk-dates">24.03 – 30.03</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">Разгрузка. Тест: <b>15</b>.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">Тест 1 км: <b>4:15–4:30</b>.</div></div>
+        <div class="wk-row"><div class="k">Итог</div><div class="v">Вес ≤78 кг, 15 подтягиваний, 100 м ≤15.0.</div></div>
+      </div>
+    </details>
+  </div>
+
+  <!-- PHASE 4 -->
+  <div class="weeks" style="--c:#ef4444;margin-top:10px">
+    <details class="week">
+      <summary><span class="wk-num">W25</span><span class="wk-title">Шлифовка</span><span class="wk-dates">31.03 – 06.04</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">3×8 без веса. Техника чистая.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">3×600 м по 2:10 + лёгкий 20 мин.</div></div>
+        <div class="wk-row"><div class="k">Спринт</div><div class="v">6×60 м на 95%.</div></div>
+        <div class="wk-row"><div class="k">Питание</div><div class="v">1650 ккал.</div></div>
+      </div>
+    </details>
+    <details class="week">
+      <summary><span class="wk-num">W26</span><span class="wk-title">Скорость 1 км</span><span class="wk-dates">07.04 – 13.04</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">3×8 + 1×max. Тест: <b>15+</b>.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">Тест 1 км: <b>4:05–4:15</b>.</div></div>
+        <div class="wk-row"><div class="k">Питание</div><div class="v">1650 ккал, белок 180 г.</div></div>
+      </div>
+    </details>
+    <details class="week">
+      <summary><span class="wk-num">W27</span><span class="wk-title">Разгрузка</span><span class="wk-dates">14.04 – 20.04</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">Турник</div><div class="v">2×6 легко. Копим силы.</div></div>
+        <div class="wk-row"><div class="k">Бег</div><div class="v">Лёгкий 20 мин ×2. Одна попытка 1 км по 4:00.</div></div>
+        <div class="wk-row"><div class="k">Спринт</div><div class="v">Тест 100 м: <b>14.0–14.3</b>.</div></div>
+        <div class="wk-row"><div class="k">Питание</div><div class="v">1700 ккал — чуть больше, быть свежим.</div></div>
+      </div>
+    </details>
+    <details class="week">
+      <summary><span class="wk-num">W28</span><span class="wk-title">ФИНАЛЬНЫЙ ТЕСТ</span><span class="wk-dates">21.04 – 01.05</span></summary>
+      <div class="wk-body">
+        <div class="wk-row"><div class="k">−5 дней</div><div class="v">Лёгкий бег 15 мин + растяжка. Турник 1×5.</div></div>
+        <div class="wk-row"><div class="k">−2 дня</div><div class="v">Полный отдых. Сон 9 ч. Много воды. Углеводы (гречка, рис).</div></div>
+        <div class="wk-row"><div class="k">−1 день</div><div class="v">Отдых, лёгкая прогулка, растяжка. Никаких нагрузок.</div></div>
+        <div class="wk-row"><div class="k">День теста</div><div class="v">Разминка 20 мин. Порядок: 100 м → 1 км → подтягивания. Отдых 30 мин между.</div></div>
+        <div class="wk-row"><div class="k">Финал</div><div class="v"><b>15+ подтягиваний · 1 км &lt;4:00 · 100 м ≤14.0 · вес 75–78 кг.</b></div></div>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ================= TECHNIQUE ================= -->
+<section id="tech">
+  <h2><span class="num">5</span> Техника</h2>
+  <div class="hint">Кривая техника = нулевой прогресс + травма.</div>
+  <div class="tech-grid">
+    <div class="tech">
+      <h3>Чистое подтягивание</h3>
+      <ol><li>Хват чуть шире плеч, большой палец сверху</li>
+      <li>Висишь прямо, руки выпрямлены</li>
+      <li>Сведи лопатки вниз — старт</li>
+      <li>Тяни локти вниз к рёбрам</li>
+      <li>Подбородок выше перекладины</li>
+      <li>Опускайся медленно, до выпрямления</li>
+      <li>Рывок и махи не считаются</li></ol>
+    </div>
+    <div class="tech">
+      <h3>Негатив</h3>
+      <ol><li>Прыжок в верхнее положение</li>
+      <li>Тело жёсткое</li>
+      <li>Опускание 5–8 сек ровно</li>
+      <li>Внизу полное выпрямление — не спрыгивай</li>
+      <li>3–5 повторов, 3–4 подхода</li></ol>
+    </div>
+    <div class="tech">
+      <h3>Лопаточные</h3>
+      <ol><li>Висишь прямо, руки прямые</li>
+      <li>Лопатки вниз — тело чуть поднимается (~5 см)</li>
+      <li>Работают только лопатки</li>
+      <li>Держи 2 сек, опустись. 5 повторов</li></ol>
+    </div>
+    <div class="tech">
+      <h3>Австралийские</h3>
+      <ol><li>Низкая перекладина, по грудь</li>
+      <li>Ноги впереди, тело прямое, пятки на земле</li>
+      <li>Тяни грудь к перекладине</li>
+      <li>Опускайся медленно. 8–12 повторов</li></ol>
+    </div>
+    <div class="tech">
+      <h3>Бег 1 км</h3>
+      <ol><li>200 м — быстро, но не рывком (58–60 сек)</li>
+      <li>600 м — ровно, дыхание 2-2</li>
+      <li>200 м — выкладываешься</li>
+      <li>Раскладка: 1:55 / 1:20 / 0:45 → 4:00</li></ol>
+    </div>
+    <div class="tech">
+      <h3>Спринт 100 м</h3>
+      <ol><li>Разминка 15 мин: A-skip, высокое бедро, захлёст</li>
+      <li>Старт: наклон вперёд, толчок</li>
+      <li>Первые 20 м — разгон, частый шаг</li>
+      <li>Середина — частота, руки под 90°</li>
+      <li>Финиш — пробегаешь за линию</li>
+      <li>Никогда не спринтуй уставшим</li></ol>
+    </div>
+  </div>
+</section>
+
+<!-- ================= NUTRITION ================= -->
+<section id="food">
+  <h2><span class="num">6</span> Питание</h2>
+  <div class="hint">Вес падает в холодильнике, а не на турнике.</div>
+  <div class="nutr">
+    <div class="nutr-card">
+      <h3>Суточные нормы</h3>
+      <table>
+        <tr><td>Калории</td><td>1 650 – 2 100 ккал</td></tr>
+        <tr><td>Белок</td><td>160 – 185 г</td></tr>
+        <tr><td>Жиры</td><td>50 – 70 г</td></tr>
+        <tr><td>Углеводы</td><td>остаток</td></tr>
+        <tr><td>Вода</td><td>2.5 – 3 л</td></tr>
+        <tr><td>Сон</td><td>7 – 8 ч</td></tr>
+        <tr><td>Шаги</td><td>10 000 – 15 000</td></tr>
+      </table>
+    </div>
+    <div class="nutr-card">
+      <h3>Пример дня</h3>
+      <div class="meal"><b>Завтрак:</b> 3 яйца + 60 г овсянки + овощи</div>
+      <div class="meal"><b>Перекус:</b> 200 г творога 5% + яблоко</div>
+      <div class="meal"><b>Обед:</b> 200 г курицы + 150 г гречки + салат</div>
+      <div class="meal"><b>Перекус:</b> греческий йогурт + горсть орехов</div>
+      <div class="meal"><b>Ужин:</b> 200 г рыбы/мяса + овощи</div>
+      <div class="meal" style="margin-top:10px;color:#f87171"><b>Запрещено:</b> булки, сахар, майонез, фастфуд, газировка, пиво, соки.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SHOES ================= -->
+<section id="shoes">
+  <h2><span class="num">7</span> Обувь: плоскостопие + сколиоз</h2>
+  <div class="hint">Гиперпронация + асимметрия = нужна стабилизация.</div>
+
+  <div class="shoe-grid">
+    <div class="shoe">
+      <h4>Asics GT-1000 14 / GT-2000</h4>
+      <p>Эталон для гиперпронации. Dynamic Duomax стабилизирует стопу, FlyteFoam + GEL гасят удар. Дроп 8 мм.</p>
+      <div class="tag">Топ-выбор</div>
+    </div>
+    <div class="shoe">
+      <h4>Brooks Adrenaline GTS 25</h4>
+      <p>Максимум контроля движения. Стабильность + амортизация. Подходит при лишнем весе.</p>
+      <div class="tag">Топ-выбор</div>
+    </div>
+    <div class="shoe">
+      <h4>Asics Gel-Kayano 33</h4>
+      <p>Максимальная поддержка, для тяжёлых бегунов. Дороже, но ресурс больше.</p>
+      <div class="tag">Премиум</div>
+    </div>
+    <div class="shoe">
+      <h4>Nike Structure 25</h4>
+      <p>Поддержка свода, стабилизация. Если хочешь Nike. Узкая колодка — меряй.</p>
+      <div class="tag">Альтернатива</div>
+    </div>
+    <div class="shoe">
+      <h4>Hoka Arahi 8</h4>
+      <p>Лёгкая стабилизация, мягкая амортизация. Хорошо для длительных пробежек.</p>
+      <div class="tag">Альтернатива</div>
+    </div>
+    <div class="shoe" style="border-left-color:#ef4444">
+      <h4>❌ Не бери</h4>
+      <p>Минималистичные, кеды, «просто беговые» без поддержки, изношенные кроссовки. Меняй каждые 600–800 км.</p>
+    </div>
+  </div>
+
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:12px">
+    <h3 style="font-size:14px;color:var(--gold);margin-bottom:8px">Ортопедические стельки</h3>
+    <p style="font-size:13.5px;color:#cbd5e1">Обязательно. Стельки с поддержкой продольного свода — <b>не плоские</b>. Индивидуальные у ортопеда (~5–15k ₽) — идеально. Готовые спортивные ортопедические — компромисс. Вставляй в кроссовки для бега.</p>
+    <p style="font-size:13.5px;color:#cbd5e1;margin-top:8px">При сколиозе обувь с амортизацией и стабильностью снижает асимметричную нагрузку на позвоночник.</p>
+  </div>
+</section>
+
+<!-- ================= REPORTING ================= -->
+<section id="report">
+  <h2><span class="num">8</span> Отчётность</h2>
+  <div class="hint">Что не записано — не сделано.</div>
+
+  <div class="report-grid">
+    <div class="rep-card">
+      <h3><span class="badge daily">Каждый день</span></h3>
+      <ul>
+        <li><span>Вес утром</span><span>после туалета</span></li>
+        <li><span>Подтягивания (макс)</span><span>число</span></li>
+        <li><span>Бег / ходьба</span><span>мин и км</span></li>
+        <li><span>Шаги</span><span>число</span></li>
+        <li><span>Калории / белок</span><span>число</span></li>
+        <li><span>Сон</span><span>часы</span></li>
+        <li><span>Самочувствие</span><span>1–10</span></li>
+      </ul>
+    </div>
+    <div class="rep-card">
+      <h3><span class="badge weekly">Воскресенье</span></h3>
+      <ul>
+        <li><span>Средний вес</span><span>за неделю</span></li>
+        <li><span>Макс подтягиваний</span><span>число</span></li>
+        <li><span>Лучший 1 км</span><span>время</span></li>
+        <li><span>Тренировок выполнено</span><span>X из 6</span></li>
+        <li><span>Что болело</span><span>список</span></li>
+        <li><span>Что провалил</span><span>честно</span></li>
+      </ul>
+    </div>
+    <div class="rep-card">
+      <h3><span class="badge monthly">1-е число</span></h3>
+      <ul>
+        <li><span>Вес</span><span>кг</span></li>
+        <li><span>Подтягивания (макс чисто)</span><span>число</span></li>
+        <li><span>1 км на время</span><span>мин:сек</span></li>
+        <li><span>100 м на время</span><span>сек</span></li>
+        <li><span>Сравнение с прошлым</span><span>+/−</span></li>
+        <li><span>Вывод</span><span>что менять</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div style="background:linear-gradient(160deg,#1a2338,#0f1626);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:12px">
+    <h3 style="font-size:14px;color:var(--gold);margin-bottom:8px">📱 Приложения для iPhone</h3>
+    <div class="apps">
+      <div class="app-row"><div class="ai">❤️</div><div><div class="an">Apple Health</div><div class="ad">Шаги, сон, пульс — база всего</div></div></div>
+      <div class="app-row"><div class="ai">🏃</div><div><div class="an">Nike Run Club / Strava</div><div class="ad">Бег: GPS, темп, интервалы</div></div></div>
+      <div class="app-row"><div class="ai">💪</div><div><div class="an">Strong / Hevy</div><div class="ad">Дневник силовых, подходы, прогресс</div></div></div>
+      <div class="app-row"><div class="ai">🍗</div><div><div class="an">Yazio / Lifesum</div><div class="ad">Калории, белок, сканер еды</div></div></div>
+      <div class="app-row"><div class="ai">💧</div><div><div class="an">WaterMinder</div><div class="ad">Напоминания пить воду</div></div></div>
+      <div class="app-row"><div class="ai">🔥</div><div><div class="an">Streaks / Way of Life</div><div class="ad">Трекер привычек, streak-логика</div></div></div>
+      <div class="app-row"><div class="ai">😴</div><div><div class="an">AutoSleep / Sleep</div><div class="ad">Качество сна, пульс ночью</div></div></div>
+      <div class="app-row"><div class="ai">⌚</div><div><div class="an">Apple Watch SE</div><div class="ad">Автоподсчёт всего. Огромный буст дисциплины</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CHECKPOINTS ================= -->
+<section>
+  <h2><span class="num">9</span> Контрольные точки</h2>
+  <div class="hint">Не выполнил — режим и еду в мусор, работаем дальше.</div>
+  <div class="table-wrap">
+    <table class="check">
+      <thead><tr><th>Дата</th><th>Вес</th><th>Подтяг.</th><th>1 км</th><th>100 м</th></tr></thead>
+      <tbody>
+        <tr><td>14.10.26</td><td>100</td><td>0</td><td>—</td><td>—</td></tr>
+        <tr><td>01.12.26</td><td>≤ 95</td><td>2–3</td><td>≤ 7:30</td><td>—</td></tr>
+        <tr><td>01.01.27</td><td>≤ 89</td><td>6–7</td><td>≤ 6:15</td><td>—</td></tr>
+        <tr><td>01.02.27</td><td>≤ 85</td><td>10</td><td>≤ 5:30</td><td>—</td></tr>
+        <tr><td>01.03.27</td><td>≤ 81</td><td>12</td><td>≤ 5:00</td><td>—</td></tr>
+        <tr><td>30.03.27</td><td>≤ 78</td><td>15</td><td>≤ 4:30</td><td>≤ 15.0</td></tr>
+        <tr class="final"><td>01.05.27</td><td>75–78</td><td>15+</td><td>&lt;4:00</td><td>≤ 14.0</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ================= RULES ================= -->
+<section>
+  <h2><span class="num">10</span> Правила без обсуждения</h2>
+  <div class="rules">
+    <h3>Нарушил — сам себе враг</h3>
+    <ol>
+      <li>Никаких булок, сахара, майонеза, фастфуда, пива. Точка.</li>
+      <li>Сон 7–8 часов. Не спишь — не растёшь и жиреешь.</li>
+      <li>Турник каждый день, кроме воскресенья. Даже 1 подход.</li>
+      <li>Бег 3–5 раз в неделю. Без пропусков.</li>
+      <li>Спринт — только свежим.</li>
+      <li>Взвешивание каждое утро, записывай.</li>
+      <li>Раз в 4 недели — тест.</li>
+      <li>Боль в суставе, сердце, головокружение — стоп, врач.</li>
+      <li>Пропустил — не догоняй двойной. Просто продолжай.</li>
+      <li>Каждые 2 недели — отчёт: вес, подтягивания, бег, самочувствие.</li>
+    </ol>
+  </div>
+</section>
+
+<div class="footer">
+  Влад · 21 год · 178 см · старт 100 кг · цель 75–78 кг<br>
+  28 недель · 200 дней · 14.10.2026 → 01.05.2027
+  <span class="big">Дисциплина важнее мотивации.</span>
+</div>
+
+</div>
+
+<!-- ================= MOBILE NAV ================= -->
+<nav class="mnav">
+  <a href="#top"><span class="ic">🏠</span>Верх</a>
+  <a href="#motiv"><span class="ic">🔥</span>Мотив</a>
+  <a href="#weeks"><span class="ic">📅</span>Недели</a>
+  <a href="#food"><span class="ic">🍗</span>Еда</a>
+  <a href="#report"><span class="ic">📊</span>Отчёт</a>
+</nav>
+
+<script>
+// Service worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+// Smooth details scroll
+document.querySelectorAll('details.week').forEach(d => {
+  d.addEventListener('toggle', () => {
+    if (d.open) setTimeout(() => d.scrollIntoView({behavior:'smooth',block:'nearest'}), 50);
+  });
+});
+</script>
+</body>
+</html>
